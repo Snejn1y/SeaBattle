@@ -1,4 +1,4 @@
-#SeaBattleGame
+# SeaBattleGame
 This is a console implementation of the classic game Sea Battle, also known as Sea Battle.
 
 ## Rules of the game
