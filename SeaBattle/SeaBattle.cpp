@@ -73,10 +73,9 @@ void SeaBattle::RandomBoard(char board[10][10]) {
     for (int i = 0; i < 10; i++)
     {
         int len = ships[i];
-        int x, y, dir;
-        x = rand() % 10;
-        y = rand() % 10;
-        dir = rand() % 2;
+        int x = rand() % 10;
+        int y = rand() % 10;
+        int dir = rand() % 2;
         while (!CanPlace(board, x, y, dir, len))
         {
             x = rand() % 10;
@@ -153,78 +152,56 @@ void SeaBattle::Fire(char board[10][10], char bboard[10][10], int x, int y, int&
 void SeaBattle::FireEom(char board[10][10], int& s, bool& hit, int& hx, int& hy)
 {
     /*
-         функція, яка відповідає за хід комп'ютера. Функція вибирає випадкову клітину на дошці, яка ще не була атакована. 
-         Якщо попередній постріл був удачним (тобто був попаданням у корабель), то функція продовжує атакувати клітини поряд з попереднім попаданням, 
-         доки корабель не буде знищено або ж не буде визначено, що він не може бути знищений.
-    */
+     * функція, яка відповідає за хід комп'ютера. Функція вибирає випадкову клітину на дошці, яка ще не була атакована.
+     * Якщо попередній постріл був удачним (тобто був попаданням у корабель), то функція продовжує атакувати клітини поряд з попереднім попаданням,
+     * доки корабель не буде знищено або ж не буде визначено, що він не може бути знищений.
+     */
 
-    int x = rand() % 10;
-    int y = rand() % 10;
-    while (board[x][y] == '~' || board[x][y] == 'X')
+    int x, y;
+    if (hit) 
     {
-        x = rand() % 10;
-        y = rand() % 10;
-    }
-    if (hit)
-    {
-        int i = rand() % 3;
-
-        if(i == 0)
+        bool found = false;
+        int directions[] = { -1, 0, 1, 0, -1 }; // ліво, вгору, вправо, вниз
+        for (int i = 0; i < 4; i++) 
         {
-            x = hx - 1;
-            y = hy;
-            if (board[x][y] == '~' || board[x][y] == 'X')
+            int nx = hx + directions[i];
+            int ny = hy + directions[i + 1];
+            if (nx >= 0 && nx < 10 && ny >= 0 && ny < 10 && board[nx][ny] == 'S') 
             {
-                x = hx + 1;
-                y = hy;
+                x = nx;
+                y = ny;
+                found = true;
+                break;
             }
         }
-        if (i == 1)
+        if (!found) 
         {
-            x = hx + 1;
-            y = hy;
-            if (board[x][y] == '~' || board[x][y] == 'X')
-            {
-                x = hx - 1;
-                y = hy;
-            }
-        }
-        if (i == 2)
-        {
-            x = hx;
-            y = hy - 1;
-            if (board[x][y] == '~' || board[x][y] == 'X')
-            {
-                x = hx;
-                y = hy + 1;
-            }
-        }
-        if (i == 3)
-        {
-            x = hx;
-            y = hy + 1;
-            if (board[x][y] == '~' || board[x][y] == 'X')
-            {
-                x = hx;
-                y = hy - 1;
-            }
+            hit = false;
         }
     }
-    if (board[x][y] == 'S')
+    if (!hit) 
+    {
+        do 
+        {
+            x = rand() % 10;
+            y = rand() % 10;
+        } 
+        while (board[x][y] == 'X' || board[x][y] == '~');
+    }
+    if (board[x][y] == 'S') 
     {
         board[x][y] = 'X';
         std::cout << "AI have hit the ship!\n";
         hit = true;
         hx = x;
         hy = y;
-        if (board[x][y] != 'S' && board[x - 1][y] != 'S' && board[x][y - 1] != 'S' && board[x][y + 1] != 'S' && board[x + 1][y] != 'S')
-        { 
+        if (board[hx - 1][hy] != 'S' && board[hx + 1][hy] != 'S' && board[hx][hy - 1] != 'S' && board[hx][hy + 1] != 'S') 
+        {
             hit = false;
-            std::cout << "AI destroy ship";
+            std::cout << "AI destroy ship\n";
         }
-            
     }
-    else
+    else 
     {
         board[x][y] = '~';
         std::cout << "AI miss(\n";
